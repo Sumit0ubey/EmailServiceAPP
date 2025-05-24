@@ -1,64 +1,204 @@
-## EmailServiceApp
 
-EmailServiceApp is a RESTful API built using **FastAPI** and **PostgreSQL** to manage email sending efficiently. It provides routes to send the email to anyone at anytime and follows RESTful principles, ensuring high performance and seamless integration.
+# 📧 EmailServiceAPI
 
-## Features
-- FastAPI-based backend for high-speed API requests
-- PostgreSQL for reliable and scalable data storage
-- Provides to type of email sending routes
-- Supports mostly all email services
-- Email-based responses for User related operation.
-- Asynchronous request handling for better performance
+EmailServiceAPI is a robust RESTful backend API built using **FastAPI**, **PostgreSQL**, and **smtplib** to facilitate secure, scalable, and customizable email delivery. It supports user management, secure tokens, and email template-based communication.
 
-## Installation
+---
 
-### Prerequisites
-Ensure you have the following installed on your system:
+## 🗂️ Project Structure
+
+```
+EmailServiceAPI/
+├── Controller/            # Business logic (email sending, validations)
+├── Routers/               # FastAPI route definitions
+├── database.py            # DB connection and session config
+├── main.py                # FastAPI app entry point
+├── models.py              # SQLAlchemy models
+├── schema.py              # Pydantic schemas
+├── utils.py               # Token gen, email formatting, helper functions
+└── .env                   # Environment variables
+```
+
+---
+
+## 🚀 Features
+
+- ✅ User registration with token delivery
+- 📧 Email sending with multiple templates (via SMTP)
+- 🔒 Token-based security & password protection
+- ⚡ Async request handling
+- 📚 Clean project structure (Controller, Routers, Models, Utils)
+- 📨 System default vs User email-based delivery
+
+---
+
+## 🔧 Installation
+
+### Requirements
+
 - Python 3.8+
 - PostgreSQL
 - pip
 
 ### Setup
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Sumit0ubey/EmailServiceAPP.git
-   cd EmailServiceAPP
-   ```
-2. Create and activate a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate   # On macOS/Linux
-   venv\Scripts\activate      # On Windows
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Set up environment variables for PostgreSQL connection:
-   ```bash
-   export DATABASE_URL="postgresql://username:password@localhost/dbname"
-   ```
-5. Run the FastAPI server:
-   ```bash
-   uvicorn main:app --reload
-   ```
 
-## API Endpoints
+```bash
+git clone https://github.com/Sumit0ubey/EmailServiceAPP.git
+cd EmailServiceAPP
 
-| Method | Endpoint                   | Description                          |
-|--------|----------------------------|--------------------------------------|
-| GET    | `/`                        | Retrieve APP info                    |
-| POST   | `/users`                   | Create a new user                    |
-| GET    | `/users/info`              | Gets a user info                     |
-| GET    | `/users/upgrade`           | Gets a email with subscription plans |
-| POST   | `/users/newToken/{id}`     | Generates a new token                |
-| PUT    | `/users/secureAccount/{id}`| Sets a password                      |
-| POST   | `/email/`                  | Sends a email with user email id     |
-| POST   | `/email/default/`          | Sends a email with System email id   |
+python -m venv venv
+source venv/bin/activate  # macOS/Linux
+venv\Scripts\activate     # Windows
 
+pip install -r requirements.txt
+```
 
-## Documentaion
+### .env Example
 
-## Author
-Developed by [Sumit dubey](https://github.com/Sumit0ubey).
+```
+DATABASE_URL=postgresql://user:password@localhost/dbname
+DEFAULT_EMAIL=default@yourdomain.com
+DEFAULT_PASSKEY=yourpassword
+SMTP_SERVER=smtp.yourdomain.com
+SMTP_PORT=587
+```
 
+---
+
+## ▶️ Run Server
+
+```bash
+uvicorn main:app --reload
+```
+
+Visit [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) for Swagger UI.
+
+---
+
+## 📘 API ROUTES
+
+### 🔹 `/` Root
+`GET /`  
+Returns API metadata: name, description, available routes, IDE used, and duration of development.
+
+---
+
+## 👤 `/users` Route
+
+All `/users` endpoints manage registration, upgrades, tokens, and securing the account.
+
+### `POST /users`
+Creates a user.  
+**Body:**
+```json
+{
+  "full_name": "John Doe",
+  "email": "john@example.com"
+}
+```
+**Behavior:** Adds user to DB, sends email with token.
+
+---
+
+### `GET /users/info/{id}`
+**Requires Header:** `token: <token>`  
+Returns: Full name, email, token, isPaidUser, numberOfEmailsSent, createdAt
+
+---
+
+### `GET /users/upgrade`
+**Requires Header:** `token: <token>`  
+Sends an email with available subscription plans.
+
+---
+
+### `POST /users/newToken/{id}`
+**Requires Header:** `token: <token>`, id, (optional password)  
+Sends a new token to the user's email after verification.
+
+---
+
+### `PUT /users/secureAccount/{id}`
+**Requires:** id, email, setPassword, confirmPassword, token  
+**Returns:** Success message
+
+---
+
+## ✉️ `/email` Routes
+
+These routes send emails using different credentials and templates.
+
+---
+
+### `POST /email`
+Sends email using the **user’s email** and **passKey**.
+
+**Fields:**
+```json
+Requires Header: token: <token>
+{
+  "title": "Hello",
+  "content": "Welcome!",
+  "sendTo": "someone@example.com",
+  "passKey": "user_email_password",
+}
+query_parameter = template_id=1&company_name=YourCo&company_link=https:/yourco.com&email_title=Notification (optional)
+```
+
+---
+
+### `POST /email/default/`
+Same fields, **except no passKey**. Uses API’s default email configured.
+
+---
+
+## 🎨 Templates (`template_id`)
+
+| ID  | Name     | Description                                                 |
+|-----|----------|-------------------------------------------------------------|
+| 0   | Simple   | No formatting, plain text                                   |
+| 1   | Cool     | Header, body, footer layout                                 |
+| 2   | Amazing  | Stylized layout with modern UI                              |
+| 3   | Custom   | Full customization + brand fields like logo, footer, etc.   |
+
+**Supported Optional Fields:**
+- `company_name`
+- `company_link`
+- `email_title`
+
+These enhance professional look and personalization in templates `1`, `2`, and `3`.
+
+---
+
+## 🧩 Code Overview
+
+| File/Folder       | Purpose                                                                 |
+|------------------|-------------------------------------------------------------------------|
+| `main.py`         | App entry point, includes routers                                       |
+| `database.py`     | DB session creation                                                     |
+| `models.py`       | SQLAlchemy models (User, etc.)                                          |
+| `schema.py`       | Pydantic models for validation                                          |
+| `utils.py`        | Token creation, email formatting utilities                              |
+| `Routers/`        | API route logic for `/users`, `/email`                                  |
+| `Controller/`     | Functional logic (sending emails, verifying users, formatting)          |
+
+---
+
+## 🧪 Testing
+
+You can use tools like:
+- Swagger UI (`/docs`)
+- Postman collection *(optional)*
+- Curl scripts
+
+---
+
+## ✍️ Author
+
+Made with ❤️ by [Sumit Dubey](https://github.com/Sumit0ubey)
+
+---
+
+## 📜 License
+
+Licensed under the [MIT License](LICENSE)
