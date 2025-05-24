@@ -202,7 +202,7 @@ Made with ❤️ by [Sumit Dubey](https://github.com/Sumit0ubey)
 ## ⚠️ Usage & License Notice
 
 This project is open-source for educational and reference purposes. It is hosted at:
-🔗 [Email Service API](https://github.com/Sumit0ubey/EmailServiceAPP)
+🔗 [Email Service API](https://emailserviceapp.onrender.com/docs)
 
 You **may view, learn from, and fork this repository**, but **you are not permitted to republish, resell, or claim it as your own** under any circumstances.
 
